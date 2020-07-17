@@ -6,13 +6,10 @@ const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
 const winston = require('winston');
 const { v4: uuid } = require('uuid');
+const cardRouter = require('./card/card-router');
 
 const app = express()
-const cards = [{
-    id: 1,
-    title: 'Task One',
-    content: 'This is card one'
-}];
+
 const lists = [{
     id: 1,
     header: 'List One',
@@ -51,6 +48,8 @@ app.use(function validateBearerToken(req, res, next) {
     next()
 })
 
+app.use(cardRouter)
+
 app.get('/', (req, res) => {
     res.send('Hello, world!')
 })
@@ -70,42 +69,10 @@ if (NODE_ENV !== 'production') {
   }));
 }
 
-app.get('/card', (req, res) => {
-    res
-      .json(cards);
-});
+
 
 app.post('/card', (req, res) => {
-  const { title, content } = req.body;
-  if (!title) {
-    logger.error(`Title is required`);
-    return res
-      .status(400)
-      .send('Invalid data');
-  }
   
-  if (!content) {
-    logger.error(`Content is required`);
-    return res
-      .status(400)
-      .send('Invalid data');
-  }
-  // get an id
-  const id = uuid();
-
-  const card = {
-    id,
-    title,
-    content
-  };
-
-  cards.push(card);
-  logger.info(`Card with id ${id} created`);
-
-  res
-    .status(201)
-    .location(`http://localhost:8000/card/${id}`)
-    .json(card);
 });
 
 
